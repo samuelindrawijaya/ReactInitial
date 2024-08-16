@@ -3,6 +3,7 @@ import { useState } from "react";
 // import { saveData } from "../interface/userData";
 import { Form, Formik, FormikProps, ErrorMessage, useFormik } from "formik";
 import * as Yup from "yup";
+import { userData } from "../interface/userData";
 // interface StepProps {
 //   step: number;
 // }
@@ -29,7 +30,7 @@ const MultiStepForm = () => {
     }
   };
 
-  const validationSchema = Yup.object({
+  const Step1Validation = Yup.object({
     username: Yup.string().email("Invalid email address").required("Required"),
     password: Yup.string()
       .min(6, "Password must be at least 6 characters")
@@ -37,22 +38,28 @@ const MultiStepForm = () => {
   });
 
 
-  const formik = useFormik({
+  const formik = useFormik<userData>({
+    initialValues: {
+      stepOne: {
+        username: '',
+        password: ''
+      },
+      stepTwo : {
+        fullname  :'',
+        HpNumber : '',
+      },
+      stepThree : {
+        email : ''
+      }
+    },
     onSubmit: (values, { setSubmitting }) => {
       setTimeout(() => {
         handleSubmit(step, values)
         setSubmitting(false)
         console.log(values)
       }, 400)
-    },
-    initialValues: {
-      username: "",
-      email: "",
-      fullname : "",
-      HpNumber : "",
-      password: "",
-    },
-  });
+    }
+  })
   return (
     <form onSubmit={formik.handleSubmit}>
     <div className="bg-blue-600 flex items-center justify-center h-screen">
@@ -87,23 +94,29 @@ const MultiStepForm = () => {
        
         {step === 1 ? (
               <Step1
-                value={formik.values.username}
-                value2={formik.values.password}
-                onChange1={formik.handleChange}
-                onChange2={formik.handleChange}
+                values={formik.values.stepOne}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                errors={formik.errors}
+                touched={formik.touched}
               />
             ) : step === 2 ? (
               <Step2
-                value={formik.values.fullname}
-                value2={formik.values.HpNumber}
-                onChange1={formik.handleChange}
+                values={formik.values.stepTwo}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                errors={formik.errors}
+                touched={formik.touched}
               />
             ) : (
               <Step3
-              value={formik.values.email}
+              values={formik.values.stepThree}
               onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              errors={formik.errors}
+              touched={formik.touched}
               />
-            )}
+            )} 
 
           <div className="flex justify-between mt-6">
             {step > 1 && (
@@ -141,13 +154,34 @@ const MultiStepForm = () => {
   );
 };
 
+// interface stepOnProps {
+//   value: any;
+//   value2: any;
+//   onChange1: any;
+//   onChange2: any;
+// }
+
 interface stepOnProps {
-  value: any;
-  value2: any;
-  onChange1: any;
-  onChange2: any;
+  values: {
+    username: string
+    password: string
+  }
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onBlur: (e: React.FocusEvent<HTMLInputElement>) => void
+  errors: {
+    stepOne?: {
+      username?: string
+      password?: string
+    }
+  }
+  touched: {
+    stepOne?: {
+      username?: boolean
+      password?: boolean
+    }
+  }
 }
-const Step1 = ({ value, value2, onChange1,onChange2 }: stepOnProps) => (
+const Step1 = ({ values, onChange, onBlur,errors,touched }: stepOnProps) => (
   <div>
     <div className="mb-4">
         <label className="block font-medium mb-2 text-gray-700" htmlFor="username">
@@ -156,10 +190,11 @@ const Step1 = ({ value, value2, onChange1,onChange2 }: stepOnProps) => (
         <input
           type="text"
           id="username"
-          name="username"
+          name='stepOne.username'
           className="w-full border border-gray-400 p-2"
-          value={value}
-          onChange={onChange1}
+          value={values.username}
+          onChange={onChange}
+          onBlur={onBlur}
         />
       </div>
       <div className="mb-4">
@@ -172,10 +207,10 @@ const Step1 = ({ value, value2, onChange1,onChange2 }: stepOnProps) => (
       <input
         type="password"
         id="password"
-        name="password"
+        name='stepOne.password'
         className="w-full border border-gray-400 p-2"
-        onChange={onChange2}
-        value={value2}
+        onChange={onChange}
+        value={values.password}
       />
       </div>
   </div>
@@ -185,12 +220,28 @@ const Step1 = ({ value, value2, onChange1,onChange2 }: stepOnProps) => (
 //   firstName: Yup.string().required('required'),
 // });
 
+
 interface stepTwoProps {
-  value: any;
-  value2: any;
-  onChange1: any;
+  values: {
+    fullname: string
+    HpNumber: string
+  }
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onBlur: (e: React.FocusEvent<HTMLInputElement>) => void
+  errors: {
+    stepTwo?: {
+      fullname?: string
+      HpNumber?: string
+    }
+  }
+  touched: {
+    stepTwo?: {
+      fullname?: boolean
+      HpNumber?: boolean
+    }
+  }
 }
-const Step2 = ({ value, value2, onChange1 }: stepTwoProps) => (
+const Step2 = ({ values, onChange, onBlur, errors,touched }: stepTwoProps) => (
   <div>
     <div className="mb-4">
         <label className="block font-medium mb-2 text-gray-700" htmlFor="fullname">
@@ -199,10 +250,11 @@ const Step2 = ({ value, value2, onChange1 }: stepTwoProps) => (
         <input
           type="text"
           id="fullname"
-          name="fullname"
+          name="stepTwo.fullname"
           className="w-full border border-gray-400 p-2"
-          value={value}
-          onChange={onChange1}
+          value={values.fullname}
+          onChange={onChange}
+          onBlur={onBlur}
         />
       </div>
       <div className="mb-4">
@@ -215,32 +267,47 @@ const Step2 = ({ value, value2, onChange1 }: stepTwoProps) => (
       <input
         type="number"
         id="HpNumber"
-        name="HpNumber"
+        name="stepTwo.HpNumber"
         className="w-full border border-gray-400 p-2"
-        onChange={onChange1}
-        value={value2}
+        onChange={onChange}
+        value={values.HpNumber}
+        onBlur={onBlur}
       />
       </div>
   </div>
 );
 
-interface steptwoProps {
-  value: any;
-  onChange: any;
+interface stepThreeProps {
+  values: {
+    email: string
+  }
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onBlur: (e: React.FocusEvent<HTMLInputElement>) => void
+  errors: {
+    stepThree?: {
+      email?: string
+    }
+  }
+  touched: {
+    stepThree?: {
+      email?: boolean
+    }
+  }
 }
-const Step3 = ({ value, onChange }: steptwoProps) => (
+const Step3 = ({ values, onChange, onBlur, errors , touched }: stepThreeProps) => (
   <div>
     <div className="mb-4">
       <label className="block font-medium mb-2 text-gray-700" htmlFor="email">
         email
       </label>
       <input
-        type=""
+        type="email"
         id="email"
-        name="email"
+        name="stepThree.email"
         className="w-full border border-gray-400 p-2"
         onChange={onChange}
-        value={value}
+        value={values.email}
+        onBlur={onBlur}
       />
     </div>
   </div>
