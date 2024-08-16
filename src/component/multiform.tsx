@@ -4,9 +4,13 @@ import { useState } from "react";
 import { Form, Formik, FormikProps, ErrorMessage, useFormik } from "formik";
 import * as Yup from "yup";
 import { userData } from "../interface/userData";
+import { stepOneSchema, stepThreeSchema, stepTwoSchema } from "../utils/registrationValidationSchemas";
+import tailwindStyles from "../assets/style";
+
 // interface StepProps {
 //   step: number;
 // }
+
 
 const MultiStepForm = () => {
   const [step, setStep] = useState(1);
@@ -30,12 +34,7 @@ const MultiStepForm = () => {
     }
   };
 
-  const Step1Validation = Yup.object({
-    username: Yup.string().email("Invalid email address").required("Required"),
-    password: Yup.string()
-      .min(6, "Password must be at least 6 characters")
-      .required("Required")
-  });
+
 
 
   const formik = useFormik<userData>({
@@ -52,6 +51,8 @@ const MultiStepForm = () => {
         email : ''
       }
     },
+    validationSchema:
+      step === 1 ? stepOneSchema : step === 2 ? stepTwoSchema : stepThreeSchema,
     onSubmit: (values, { setSubmitting }) => {
       setTimeout(() => {
         handleSubmit(step, values)
@@ -191,11 +192,20 @@ const Step1 = ({ values, onChange, onBlur,errors,touched }: stepOnProps) => (
           type="text"
           id="username"
           name='stepOne.username'
-          className="w-full border border-gray-400 p-2"
           value={values.username}
           onChange={onChange}
           onBlur={onBlur}
+          className={`${tailwindStyles.input} ${
+            errors.stepOne?.username && touched.stepOne?.username
+              ? 'text-pink-600 border-pink-500'
+              : ''
+          }`}
         />
+        {errors.stepOne?.username && touched.stepOne?.username ? (
+          <div className={tailwindStyles.errorText}>
+            {errors.stepOne.username}
+          </div>
+        ) : null}
       </div>
       <div className="mb-4">
       <label
@@ -208,10 +218,20 @@ const Step1 = ({ values, onChange, onBlur,errors,touched }: stepOnProps) => (
         type="password"
         id="password"
         name='stepOne.password'
-        className="w-full border border-gray-400 p-2"
+        className={`${tailwindStyles.input} ${
+          errors.stepOne?.password && touched.stepOne?.password
+            ? 'text-pink-600 border-pink-500'
+            : ''
+        }`}
         onChange={onChange}
         value={values.password}
+        onBlur={onBlur}
       />
+      {errors.stepOne?.password && touched.stepOne?.password ? (
+          <div className={tailwindStyles.errorText}>
+            {errors.stepOne.password}
+          </div>
+        ) : null}
       </div>
   </div>
 );
@@ -251,11 +271,20 @@ const Step2 = ({ values, onChange, onBlur, errors,touched }: stepTwoProps) => (
           type="text"
           id="fullname"
           name="stepTwo.fullname"
-          className="w-full border border-gray-400 p-2"
+          className={`${tailwindStyles.input} ${
+            errors.stepTwo?.fullname && touched.stepTwo?.fullname
+              ? 'text-pink-600 border-pink-500'
+              : ''
+          }`}
           value={values.fullname}
           onChange={onChange}
           onBlur={onBlur}
         />
+        {errors.stepTwo?.fullname && touched.stepTwo?.fullname ? (
+        <div className={tailwindStyles.errorText}>
+          {errors.stepTwo.fullname}
+        </div>
+        ) : null}
       </div>
       <div className="mb-4">
       <label
@@ -268,12 +297,21 @@ const Step2 = ({ values, onChange, onBlur, errors,touched }: stepTwoProps) => (
         type="number"
         id="HpNumber"
         name="stepTwo.HpNumber"
-        className="w-full border border-gray-400 p-2"
+        className={`${tailwindStyles.input} ${
+          errors.stepTwo?.HpNumber && touched.stepTwo?.HpNumber
+            ? 'text-pink-600 border-pink-500'
+            : ''
+        }`}
         onChange={onChange}
         value={values.HpNumber}
         onBlur={onBlur}
       />
       </div>
+      {errors.stepTwo?.HpNumber && touched.stepTwo?.HpNumber ? (
+        <div className={tailwindStyles.errorText}>
+          {errors.stepTwo.HpNumber}
+        </div>
+        ) : null}
   </div>
 );
 
@@ -304,11 +342,20 @@ const Step3 = ({ values, onChange, onBlur, errors , touched }: stepThreeProps) =
         type="email"
         id="email"
         name="stepThree.email"
-        className="w-full border border-gray-400 p-2"
+        className={`${tailwindStyles.input} ${
+          errors.stepThree?.email && touched.stepThree?.email
+            ? 'text-pink-600 border-pink-500'
+            : ''
+        }`}
         onChange={onChange}
         value={values.email}
         onBlur={onBlur}
       />
+      {errors.stepThree?.email && touched.stepThree?.email ? (
+        <div className={tailwindStyles.errorText}>
+          {errors.stepThree.email}
+        </div>
+        ) : null}
     </div>
   </div>
 );
